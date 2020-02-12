@@ -1,16 +1,19 @@
 
-
+#include <String.h>
 #include <LiquidCrystal.h> // includes the LiquidCrystal Library 
-LiquidCrystal lcd(12,11,5,4,3,2); // Creates an LC object. Parameters: (rs, enable, d4, d5, d6, d7) 
+LiquidCrystal lcd(A4,A5,A0,A1,A2,A3); // Creates an LC object. Parameters: (rs, enable, d4, d5, d6, d7) 
 const int buttonPin = 8;
-
-void setup() { 
+String one= "1";
+int arr[]={10000,01000,00100,00010,00001};
+void setup() 
+{ 
    lcd.begin(16,2);
    pinMode(buttonPin, INPUT);
    lcd.print("Press the button to start the game!");
    Serial.begin(9600);
   
    pinMode(7,INPUT);
+   pinMode(10,INPUT);
    
    // Initializes the interface to the LCD screen, and specifies the dimensions (width and height) of the display } 
 }
@@ -18,12 +21,24 @@ void setup() {
 void loop() { 
   // Prints "Arduino" on the LCD 
 
-  int button = digitalRead(buttonPin);
+int button = digitalRead(buttonPin);
+String result=hit(7,6,5,4,3);
+Serial.println(result);
+delay (100);
 
-  int val;
-  val=digitalRead(7);
-  Serial.print(val);
-  delay(100);
+
+
+delay(200);
+//String val;
+//val=digitalRead(7);
+//Serial.print(val);
+//String val2;
+//val2=digitalRead(10);
+//Serial.print(val2);
+//delay(100);
+  
+  
+
 
   if (button == HIGH){
     lcd.clear();
@@ -41,7 +56,15 @@ void loop() {
 
   
 }
-
+String hit(int a, int b, int c, int d, int f){
+  String result="";
+result+=digitalRead(a);  
+result+=digitalRead(b); 
+result+=digitalRead(c); 
+result+=digitalRead(d); 
+result+=digitalRead(f);
+return result; 
+}
 void game() {
   int t = 20;
   while (t > 0){
