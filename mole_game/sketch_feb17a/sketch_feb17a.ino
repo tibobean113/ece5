@@ -53,6 +53,7 @@ void begin_game(){
 
 void whack_a_mole(){
   int arr[]={0,0,0,0};
+  int *p;
     
   begin_game();
   
@@ -66,6 +67,16 @@ void whack_a_mole(){
 
     if (arr[rand_num2] == 0)
       arr[rand_num2] = 1;
+
+    p = getHits(7,6,5,4);
+
+    for (int i=0;i<4;i++){
+      if (p[i] != arr[rand_num1])
+        Serial.print("mole " + (String)i + " hit");
+
+      if (p[i] != arr[rand_num2])
+        Serial.print("mole " + (String)i + " hit");    
+    }
 
 
     delay(1000);
