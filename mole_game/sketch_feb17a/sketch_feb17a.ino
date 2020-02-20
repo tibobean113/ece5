@@ -1,3 +1,5 @@
+
+
 /*
   LiquidCrystal Library - Hello World
 
@@ -39,7 +41,7 @@
 
 // include the library code:
 #include <LiquidCrystal.h>
-#include <time.h>
+#include <Entropy.h>
 
 // initialize the library with the numbers of the interface pins
 LiquidCrystal lcd(A4,A5,A0,A1,A2,A3);
@@ -112,18 +114,14 @@ void whack_a_mole(){
     int rand_num3 = rand_num1;
     int rand_num4 = rand_num1;
     
-    if (control >= 8){ //chance for 2 moles to pop up at once
+    if (control >= 9){ //chance for 2 moles to pop up at once
       rand_num2 = (int) random(0,4);
 
       control = (int) random(1,11);
       //Serial.println(control);
       if (control >= 8){ //3 moles
         rand_num3 = (int) random(0,4);
-
-        control = (int) random(1,11);
-       // Serial.println(control);
-        if (control >= 8) //four moles (very rare)
-          rand_num4 = (int) random(0,4);
+        rand_num4 = (int) random(0,4);
       }
     }
       
@@ -198,10 +196,11 @@ void setup() {
 
   pinMode(8,INPUT);
   
-  randomSeed(millis());
+  Entropy.initialize();
+  randomSeed(Entropy.random());
   whack_a_mole();
 }
 
 void loop() {
-
+  
 }
