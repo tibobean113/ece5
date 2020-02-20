@@ -39,6 +39,7 @@
 
 // include the library code:
 #include <LiquidCrystal.h>
+#include <time.h>
 
 // initialize the library with the numbers of the interface pins
 LiquidCrystal lcd(A4,A5,A0,A1,A2,A3);
@@ -92,7 +93,7 @@ void whack_a_mole(){
            
   begin_game();
 
-  int timer = 20;
+  int timer = 120;
 
   int score = 0;
   lcd.setCursor(0,0);
@@ -106,23 +107,49 @@ void whack_a_mole(){
     int arr[]={0,0,0,0}; 
     int rand_num1 = (int) random(0,4);
     int control = (int) random(1,11);
-    int rand_num2;
+    //Serial.println(control);
+    int rand_num2 = rand_num1;
+    int rand_num3 = rand_num1;
+    int rand_num4 = rand_num1;
     
-    if (control >= 8)
+    if (control >= 8){ //chance for 2 moles to pop up at once
       rand_num2 = (int) random(0,4);
-    else  
-      rand_num2 = rand_num1;
+
+      control = (int) random(1,11);
+      //Serial.println(control);
+      if (control >= 8){ //3 moles
+        rand_num3 = (int) random(0,4);
+
+        control = (int) random(1,11);
+       // Serial.println(control);
+        if (control >= 8) //four moles (very rare)
+          rand_num4 = (int) random(0,4);
+      }
+    }
       
     if (arr[rand_num1] == 0)
       arr[rand_num1] = 1;
 
     if (arr[rand_num2] == 0)
-      arr[rand_num2] = 1;  
+      arr[rand_num2] = 1;
+
+    if (arr[rand_num3] == 0)
+      arr[rand_num3] = 1;
+
+    if (arr[rand_num4] == 0)
+      arr[rand_num4] = 1;
+        
 
     for (int i=0;i<4;i++)
       Serial.print(arr[i]);
     Serial.print("\n");
-      for (int pin=3;pin<=6;pin++){
+
+    delay(1000);
+        
+    timer -= 1;
+    timerPrint(timer);
+    
+      for (int pin=3;pin<=6;pin++){ //this loop checks for any moles that have been hit
         
         if (getHit(pin) == arr[pin-3]){
           Serial.println("Mole hit on pin: " + (String)pin);
@@ -139,23 +166,20 @@ void whack_a_mole(){
       
     
     lcd.setCursor(0,1);
-    lcd.print(score);
+    lcd.print(score); //updates score
     
     
     delay(1000);
     timer -= 1;
     timerPrint(timer);
     delay(1000);
-    timer -= 1;
-    timerPrint(timer);
-    delay(1000);    
     timer -= 1;
     timerPrint(timer);
     
   }
 
   lcd.clear();
-  lcd.print("GAME OVER");
+  lcd.print("TIME'S UP!");
   delay(2000);
   lcd.clear();
   lcd.print("Your score was:");
@@ -167,13 +191,14 @@ void whack_a_mole(){
 
 void setup() {
   Serial.begin(9600);
+
   // set up the LCD's number of columns and rows:
   lcd.begin(16, 2);  
   // Print a message to the LCD.
 
-  pinMode(7,INPUT);
-  pinMode(10,INPUT);
+  pinMode(8,INPUT);
   
+  randomSeed(millis());
   whack_a_mole();
 }
 
