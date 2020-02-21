@@ -45,28 +45,10 @@ void begin_game(){
   lcd.clear();
 }
 
-void loading_bar(){
-    byte bar[]{
-    B11111,
-    B11111,
-    B11111,
-    B11111,
-    B11111,
-    B11111,
-    B11111,
-    B11111,
-  };
 
-  int duration = 0;
-  //button = digitalRead(8);
-  duration += 1;
-        
-  lcd.write(byte(duration));
-}
-
-int choose_game(){
-  delay(1000);
-  String gameList[] = {"Whack-a-mole","Laser Hold"};
+int choose(String gameList[]){
+  delay(400);
+  //String gameList[] = {"Whack-a-mole","Laser Hold"};
 
   byte bar[]{
     B11111,
@@ -105,14 +87,14 @@ int choose_game(){
 
         if (duration == 17){
           lcd.clear();
-          lcd.print(gameList[choice] + " chosen!");
+          //lcd.print(gameList[choice] + " chosen!");
           return choice;
         }
       
         delay(50);
       }
 
-      if (duration <= 0){
+      if (duration <= 1){
         choice+=1;
         if (choice > 1) choice = 0;
       }
@@ -127,8 +109,31 @@ int choose_game(){
 void end_game(){
   Serial.println("Ending game");
   lcd.clear();
-  lcd.print("Time's up!");
-  lcd.clear();
+  lcd.print("Choose another");
+  lcd.setCursor(0,1);
+  lcd.print("game?");
+  
+  while(true){
+    if (digitalRead(8) == 1){
+      String a[] = {"Yes","No"};
+      int x = choose(a);
+      if (x==0){
+        String b[] = {"Whack-a-mole","Laser Hold"};
+        x = choose(b);
+        if (x==0) whack_a_mole();
+        if (x==1) laser_hold();
+      }else{ 
+        lcd.clear();
+        lcd.print("Press to start");
+        delay(400);
+        return;
+      }
+        
+        
+    } 
+    
+  }
+  
 }
 
 void laser_hold(){
@@ -156,16 +161,16 @@ void laser_hold(){
   lcd.clear();
 
   if (score1 >= 100){
-    Serial.print("Player 1 wins!");
-    delay(1000);
+    lcd.print("Player 1 wins!");
+    delay(3000);
     end_game();
   }else if (score2 >= 100){
-    Serial.print("Player 2 wins!");
-    delay(1000);
+    lcd.print("Player 2 wins!");
+    delay(3000);
     end_game();
   }else{
-    Serial.print("Tie game!");
-    delay(1000);
+    lcd.print("Tie game!");
+    delay(3000);
     end_game();
   }
     
@@ -175,7 +180,7 @@ void whack_a_mole(){
            
   begin_game();
 
-  int timer = 120;
+  int timer = 20;
 
   int score = 0;
   lcd.setCursor(0,0);
@@ -263,6 +268,8 @@ void whack_a_mole(){
   lcd.print("Your score was:");
   lcd.setCursor(0,1);
   lcd.print(score);
+  delay(6000);
+  end_game();
   
 }
  
@@ -275,6 +282,8 @@ void setup() {
   // Print a message to the LCD.
 
   pinMode(8,INPUT);
+
+  String gameList[] = {"Whack-a-mole","Laser Hold"};
   
   Entropy.initialize();
   randomSeed(Entropy.random());
@@ -285,11 +294,14 @@ void setup() {
 }
 
 void loop() {
+
   if (digitalRead(8) == HIGH){
     lcd.clear();
-    int x = choose_game();
+    String a[] = {"Whack-a-mole","Laser Hold"};
+    int x = choose(a);
     
     if (x == 0) whack_a_mole();
     if (x == 1) laser_hold();
   }
+  delay(100);
 }
