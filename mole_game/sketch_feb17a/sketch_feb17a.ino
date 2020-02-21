@@ -1,44 +1,4 @@
 
-
-/*
-  LiquidCrystal Library - Hello World
-
- Demonstrates the use a 16x2 LCD display.  The LiquidCrystal
- library works with all LCD displays that are compatible with the
- Hitachi HD44780 driver. There are many of them out there, and you
- can usually tell them by the 16-pin interface.
-
- This sketch prints "Hello World!" to the LCD
- and shows the time.
-
-  The circuit:
- * LCD RS pin to digital pin 12
- * LCD Enable pin to digital pin 11
- * LCD D4 pin to digital pin 5
- * LCD D5 pin to digital pin 4
- * LCD D6 pin to digital pin 3
- * LCD D7 pin to digital pin 2
- * LCD R/W pin to ground
- * LCD VSS pin to ground
- * LCD VCC pin to 5V
- * 10K resistor:
- * ends to +5V and ground
- * wiper to LCD VO pin (pin 3)
-
- Library originally added 18 Apr 2008
- by David A. Mellis
- library modified 5 Jul 2009
- by Limor Fried (http://www.ladyada.net)
- example added 9 Jul 2009
- by Tom Igoe
- modified 22 Nov 2010
- by Tom Igoe
-
- This example code is in the public domain.
-
- http://www.arduino.cc/en/Tutorial/LiquidCrystal
- */
-
 // include the library code:
 #include <LiquidCrystal.h>
 #include <Entropy.h>
@@ -53,6 +13,7 @@ int getHit(int a){
   else
     return 2;
 }
+
 
 int numPlaces (int n) {
     if (n < 10) return 1;
@@ -84,11 +45,130 @@ void begin_game(){
   lcd.clear();
 }
 
+void loading_bar(){
+    byte bar[]{
+    B11111,
+    B11111,
+    B11111,
+    B11111,
+    B11111,
+    B11111,
+    B11111,
+    B11111,
+  };
+
+  int duration = 0;
+  //button = digitalRead(8);
+  duration += 1;
+        
+  lcd.write(byte(duration));
+}
+
+int choose_game(){
+  delay(1000);
+  String gameList[] = {"Whack-a-mole","Laser Hold"};
+
+  byte bar[]{
+    B11111,
+    B11111,
+    B11111,
+    B11111,
+    B11111,
+    B11111,
+    B11111,
+    B11111,
+  };
+
+  for (int i=0;i<8;i++) lcd.createChar(i, bar);
+  
+  int choice = 0;
+  int duration = 0;
+  int button = digitalRead(8);
+
+  lcd.clear();
+  lcd.print(gameList[choice]);
+  
+  while(true){
+    button = digitalRead(8);
+    
+    if (button == 1){
+
+    delay(200);
+    
+    button = digitalRead(8);
+    lcd.setCursor(0,1);
+      while (button == 1){
+        button = digitalRead(8);
+        duration += 1;
+        
+        lcd.write(byte(duration));
+
+        if (duration == 17){
+          lcd.clear();
+          lcd.print(gameList[choice] + " chosen!");
+          return choice;
+        }
+      
+        delay(50);
+      }
+
+      if (duration <= 0){
+        choice+=1;
+        if (choice > 1) choice = 0;
+      }
+      duration = 0;
+      lcd.clear();
+      lcd.print(gameList[choice]);
+    }
+
+  }
+}
+
 void end_game(){
   Serial.println("Ending game");
   lcd.clear();
   lcd.print("Time's up!");
   lcd.clear();
+}
+
+void laser_hold(){
+  begin_game();
+  
+  int score1 = 0;
+  int score2 = 0;
+
+  lcd.setCursor(0,0);
+  lcd.print("P1");
+  lcd.setCursor(14,0);
+  lcd.print("P2");
+
+  while (score1<100 and score2<100){
+    if (getHit(3) == 1) score1 += 1;
+    if (getHit(4) == 1) score2 += 1;
+
+    lcd.setCursor(0,1);
+    lcd.print(score1);
+    timerPrint(score2);
+
+    delay(100);
+  }
+
+  lcd.clear();
+
+  if (score1 >= 100){
+    Serial.print("Player 1 wins!");
+    delay(1000);
+    end_game();
+  }else if (score2 >= 100){
+    Serial.print("Player 2 wins!");
+    delay(1000);
+    end_game();
+  }else{
+    Serial.print("Tie game!");
+    delay(1000);
+    end_game();
+  }
+    
 }
 
 void whack_a_mole(){
@@ -198,9 +278,18 @@ void setup() {
   
   Entropy.initialize();
   randomSeed(Entropy.random());
-  whack_a_mole();
+
+  lcd.print("Press to start");
+  
+  
 }
 
 void loop() {
-  
+  if (digitalRead(8) == HIGH){
+    lcd.clear();
+    int x = choose_game();
+    
+    if (x == 0) whack_a_mole();
+    if (x == 1) laser_hold();
+  }
 }
