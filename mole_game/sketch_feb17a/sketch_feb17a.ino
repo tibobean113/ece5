@@ -109,9 +109,9 @@ int choose(String gameList[]){
 void end_game(){
   Serial.println("Ending game");
   lcd.clear();
-  lcd.print("Choose another");
+  lcd.print("Play another");
   lcd.setCursor(0,1);
-  lcd.print("game?");
+  lcd.print("game? (Press button)");
   
   while(true){
     if (digitalRead(8) == 1){
@@ -136,8 +136,24 @@ void end_game(){
   
 }
 
+void memorise_pattern(){ //I'll finish this game if we have time
+  int i = 6;
+  int a[5];
+  int b[5];
+  
+  for (i-0;i<6;i++){
+    a[i] = (int) random(0,4);
+  }
+
+  while(true){
+    
+  }
+}
+
 void laser_hold(){
   begin_game();
+
+  digitalWrite(9, HIGH);
   
   int score1 = 0;
   int score2 = 0;
@@ -192,6 +208,7 @@ void whack_a_mole(){
   
   while(timer > 0){
     int arr[]={0,0,0,0}; 
+
     int rand_num1 = (int) random(0,4);
     int control = (int) random(1,11);
     //Serial.println(control);
@@ -210,34 +227,47 @@ void whack_a_mole(){
       }
     }
       
-    if (arr[rand_num1] == 0)
-      arr[rand_num1] = 1;
+    if (arr[rand_num1] == 0){
+      arr[rand_num1] == 1;
+      if (rand_num1 == 0)
+        digitalWrite(9, HIGH);
+    }
+      
 
-    if (arr[rand_num2] == 0)
+
+    if (arr[rand_num2] == 0){
       arr[rand_num2] = 1;
+      if (rand_num2 == 0)
+        digitalWrite(9, HIGH);
+    }
 
-    if (arr[rand_num3] == 0)
+    if (arr[rand_num3] == 0){
       arr[rand_num3] = 1;
+      if (rand_num3 == 0)
+        digitalWrite(9, HIGH);
+    }
 
-    if (arr[rand_num4] == 0)
+    if (arr[rand_num4] == 0){
       arr[rand_num4] = 1;
+      if (rand_num4 == 0)
+        digitalWrite(9, HIGH);
+    }
         
 
     for (int i=0;i<4;i++)
       Serial.print(arr[i]);
     Serial.print("\n");
 
-    delay(1000);
-        
-    timer -= 1;
-    timerPrint(timer);
-    
+
+    for (int i = 0;i<2;i++){
+    for(uint32_t t_initial = millis(); millis() - t_initial < 1000; ){
       for (int pin=3;pin<=6;pin++){ //this loop checks for any moles that have been hit
         
         if (getHit(pin) == arr[pin-3]){
           Serial.println("Mole hit on pin: " + (String)pin);
 
           score += 1;
+          if (pin == 3) digitalWrite(9, LOW);
           arr[pin-3] = 0;
           
           for (int i=0;i<4;i++)
@@ -247,17 +277,17 @@ void whack_a_mole(){
         
       }
       
+    }
+
+    timer--;
+    timerPrint(timer);
+    
+    }
+
+    digitalWrite(9, LOW);
     
     lcd.setCursor(0,1);
     lcd.print(score); //updates score
-    
-    
-    delay(1000);
-    timer -= 1;
-    timerPrint(timer);
-    delay(1000);
-    timer -= 1;
-    timerPrint(timer);
     
   }
 
@@ -282,6 +312,7 @@ void setup() {
   // Print a message to the LCD.
 
   pinMode(8,INPUT);
+  pinMode(9,OUTPUT);
 
   String gameList[] = {"Whack-a-mole","Laser Hold"};
   
