@@ -197,7 +197,7 @@ void whack_a_mole(){
            
   begin_game();
 
-  int timer = 26;
+  int timer = 500;
 
   int score = 0;
   lcd.setCursor(0,0);
@@ -206,10 +206,13 @@ void whack_a_mole(){
   lcd.print(score);
   lcd.setCursor(16 - numPlaces(timer),1);
   lcd.print(timer);
+
+  int led_arr[]={9,2,7,1};
   
   while(timer > 0){
     int arr[]={0,0,0,0}; 
-
+    
+    
     int rand_num1 = (int) random(0,4);
     int control = (int) random(1,11);
     //Serial.println(control);
@@ -231,6 +234,7 @@ void whack_a_mole(){
     if (arr[rand_num1] == 0){
       arr[rand_num1] == 1;
       digitalWrite(rand_num1 + 10,HIGH);
+      digitalWrite(led_arr[rand_num1], HIGH);
     }
       
 
@@ -238,16 +242,19 @@ void whack_a_mole(){
     if (arr[rand_num2] == 0){
       arr[rand_num2] = 1;
       digitalWrite(rand_num2 + 10,HIGH);
+      digitalWrite(led_arr[rand_num2], HIGH);
     }
 
     if (arr[rand_num3] == 0){
       arr[rand_num3] = 1;
       digitalWrite(rand_num3 + 10,HIGH);
+      digitalWrite(led_arr[rand_num3], HIGH);
     }
 
     if (arr[rand_num4] == 0){
       arr[rand_num4] = 1;
       digitalWrite(rand_num4 + 10,HIGH);
+      digitalWrite(led_arr[rand_num4], HIGH);
     }
         
 
@@ -265,6 +272,7 @@ void whack_a_mole(){
 
           score += 1;
           digitalWrite(pin+7,LOW);
+          digitalWrite(led_arr[pin-3], LOW);
           arr[pin-3] = 0;
           
           for (int i=0;i<4;i++)
@@ -291,6 +299,11 @@ void whack_a_mole(){
     digitalWrite(12,LOW);
     digitalWrite(13,LOW);
 
+    digitalWrite(9, LOW);
+    digitalWrite(2, LOW);
+    digitalWrite(7, LOW);
+    digitalWrite(1, LOW);
+
     delay(500);
     timer--;
     timerPrint(timer);
@@ -314,7 +327,7 @@ void whack_a_mole(){
  
 
 void setup() {
-  Serial.begin(9600);
+  //Serial.begin(9600);
 
   // set up the LCD's number of columns and rows:
   lcd.begin(16, 2);  
@@ -325,6 +338,12 @@ void setup() {
   pinMode(11, OUTPUT);
   pinMode(12, OUTPUT);
   pinMode(13, OUTPUT);
+  
+  pinMode(9, OUTPUT);
+  pinMode(2, OUTPUT);
+  pinMode(7, OUTPUT);
+  pinMode(1, OUTPUT);
+  digitalWrite(1, LOW);
 
   String gameList[] = {"Whack-a-mole","Laser Hold"};
   
